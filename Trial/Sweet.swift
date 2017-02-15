@@ -30,4 +30,8 @@ struct Sweet {
         
         addedbyUser = (snapshot.value as? NSDictionary)?["addedbyUser"] as? String ?? ""
     }
+    
+    func toAnyObject() -> Any{
+        return ["content":content, "addedbyUser":addedbyUser]
+    }
 }
