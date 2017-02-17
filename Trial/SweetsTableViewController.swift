@@ -19,9 +19,57 @@ class SweetsTableViewController: UITableViewController {
         super.viewDidLoad()
         dbRef = FIRDatabase.database().reference().child("sweet-items")
         startObservingDB()
+            }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        FIRAuth.auth()?.addStateDidChangeListener({ (FIRAuth, FIRUser) in
+            if let user = FIRUser{
+                print("Welcome \( user.email)")
+                self.startObservingDB()
+            } else{
+                print("You need to signup to login first")
+            }
+        })
     }
-    
-    
+    @IBAction func loginandsignup(_ sender: Any) {
+        let userAlert = UIAlertController(title: "login/signup", message: "Enter Email and password", preferredStyle:.alert)
+        userAlert.addTextField(configurationHandler: {(textField:UITextField)in
+        textField.placeholder = "Email"
+        })
+        
+        userAlert.addTextField(configurationHandler: {
+            (textField:UITextField) in
+            textField.isSecureTextEntry = true
+            textField.placeholder = "Password"
+        })
+        userAlert.addAction(UIAlertAction(title: "Sign in",
+                                      style: UIAlertActionStyle.default,
+                                      handler: {(alert: UIAlertAction!) in
+            let emailTextField = userAlert.textFields!.first!
+            let passwordTextField = userAlert.textFields!.last!
+                                        
+                                        FIRAuth.auth()?.signIn(withEmail: emailTextField.text!, password: passwordTextField.text!, completion: {
+                                            (user:FIRUser?, Error) in
+                                            if Error != nil {
+                                                print(Error!.localizedDescription)
+                                            }
+                                        })
+        }))
+        userAlert.addAction(UIAlertAction(title: "Sign up",
+                                          style: UIAlertActionStyle.default,
+                                          handler: {(alert: UIAlertAction!) in
+            let emailTextField = userAlert.textFields!.first!
+            let passwordTextField = userAlert.textFields!.last!
+                                            
+            FIRAuth.auth()?.createUser(withEmail: emailTextField.text!, password: passwordTextField.text!, completion: {(user:FIRUser?, Error) in
+                if Error != nil {
+                                                    print(Error!.localizedDescription)
+                                                }
+                                            })
+        }))
+        self.present(userAlert, animated: true, completion: nil)
+    }
+
     func startObservingDB(){
         dbRef.observe(.value, with: {(snapshot: FIRDataSnapshot) in
             var newSweets = [Sweet]()
@@ -75,5 +123,10 @@ class SweetsTableViewController: UITableViewController {
             cell.detailTextLabel?.text = sweet.addedbyUser
         return cell
     }
-
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete{
+            let sweet = sweets[indexPath.row]
+            sweet.itemRef?.removeValue()
+        }
+    }
 }

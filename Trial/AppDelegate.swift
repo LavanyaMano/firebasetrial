@@ -17,16 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FIRApp.configure()
-        FIRAuth.auth()?.signIn(withEmail: "lava@lava.com", password: "123456") { (user, error) in
-            if error==nil
-            {
-                print(user?.email ?? "hello")
-            }
-            else{
-                print(error?.localizedDescription ?? "dont know errorrrrr!")
-            }
-            
-        } ;      return true
+//        FIRAuth.auth()?.signIn(withEmail: "lava@lava.com", password: "123456") { (user, error) in
+//            if error==nil
+//            {
+//                print(user?.email ?? "hello")
+//            }
+//            else{
+//                print(error?.localizedDescription ?? "dont know errorrrrr!")
+//            }
+//            
+//        } ;      
+        return true
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
